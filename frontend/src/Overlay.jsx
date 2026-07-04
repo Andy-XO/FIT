@@ -20,7 +20,7 @@ function Section({ id, refCb, align = 'center', children }) {
         variants={reveal}
         initial="hidden"
         whileInView="show"
-        viewport={{ once: false, amount: 0.35 }}
+        viewport={{ once: true, amount: 0.15 }}
         className="w-full max-w-xl"
       >
         {children}
