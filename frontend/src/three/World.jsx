@@ -92,17 +92,17 @@ function BodyComposition({ y }) {
   return (
     <group position={[-3, y, 0]}>
       <group ref={spin}>
-        {/* lean mass — solid inner core */}
+        {/* lean mass - solid inner core */}
         <mesh>
           <sphereGeometry args={[1.35, 48, 48]} />
           <meshStandardMaterial color={EMERALD} emissive={EMERALD} emissiveIntensity={0.5} roughness={0.4} metalness={0.3} />
         </mesh>
-        {/* fat mass — translucent outer shell */}
+        {/* fat mass - translucent outer shell */}
         <mesh>
           <sphereGeometry args={[2.0, 48, 48]} />
           <meshStandardMaterial color={AMBER} emissive={AMBER} emissiveIntensity={0.25} transparent opacity={0.28} roughness={0.15} metalness={0.1} side={THREE.DoubleSide} />
         </mesh>
-        {/* visceral fat — angry pulsing orb near the centre */}
+        {/* visceral fat - angry pulsing orb near the centre */}
         <mesh ref={visceral}>
           <sphereGeometry args={[0.34, 24, 24]} />
           <meshStandardMaterial color={RUST} emissive={RUST} emissiveIntensity={1.6} roughness={0.5} />

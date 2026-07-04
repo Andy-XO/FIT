@@ -109,7 +109,7 @@ export default function Overlay({ setRef, checklistApi }) {
             The <span className="text-emerald2">Transformation</span>
           </h1>
           <p className="mt-5 max-w-md text-ink/60 text-[15px] mx-auto md:mx-0">
-            Not a checklist on paper — your body, your numbers, and your plan rendered as a world you
+            Not a checklist on paper - your body, your numbers, and your plan rendered as a world you
             move through. Scroll to begin the descent.
           </p>
           <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-lg mx-auto md:mx-0">
@@ -128,10 +128,10 @@ export default function Overlay({ setRef, checklistApi }) {
           <p className="eyebrow mb-3">01 · Where the mass sits</p>
           <h2 className="text-3xl font-extrabold tracking-tight mb-4">Body composition</h2>
           <p className="text-ink/65 text-[14px] leading-relaxed">
-            The glowing core is your <b className="text-emerald2">{profile.leanKg} kg of lean mass</b> — the
+            The glowing core is your <b className="text-emerald2">{profile.leanKg} kg of lean mass</b> - the
             engine you protect. Around it, the amber shell is <b className="text-amber2">{profile.fatKg} kg of
             fat</b> ({profile.bodyFatPct}%). The small red orb is <b className="text-rust2">visceral fat</b> at
-            17 — the number that matters most for your health.
+            17 - the number that matters most for your health.
           </p>
           <div className="mt-5 grid grid-cols-3 gap-3">
             <Chip k="Weight" v={`${profile.weightKg} kg`} />
@@ -148,7 +148,7 @@ export default function Overlay({ setRef, checklistApi }) {
           <h2 className="text-3xl font-extrabold tracking-tight mb-4">116 → 97 → 88</h2>
           <p className="text-ink/65 text-[14px] leading-relaxed">
             At <b>~{profile.paceKgPerWeek} kg per week</b>, the path bends downward in stages. First
-            checkpoint: <b className="text-teal2">~95–100 kg / ~25%</b> — re-scan there. Then keep the loop
+            checkpoint: <b className="text-teal2">~95-100 kg / ~25%</b> - re-scan there. Then keep the loop
             running: <span className="mono text-ink/80">Lose → Reward → Reset → Adjust → Repeat.</span>
           </p>
           <div className="mt-5 flex flex-col gap-2">
@@ -162,7 +162,7 @@ export default function Overlay({ setRef, checklistApi }) {
         </div>
       </Section>
 
-      {/* 3 · FUEL — center stays clear so all four 3D rings read through */}
+      {/* 3 · FUEL - center stays clear so all four 3D rings read through */}
       <section
         id="targets"
         ref={setRef(3)}
@@ -179,7 +179,7 @@ export default function Overlay({ setRef, checklistApi }) {
           <h2 className="text-3xl font-extrabold tracking-tight">Hit these every day</h2>
           <p className="text-ink/55 text-[13.5px] mt-2 leading-relaxed">
             {profile.targetKcal} kcal across <b>{profile.meals} meals</b> of ~{profile.kcalPerMeal} kcal. The
-            rings are calories, protein, carbs and fats — protein is the one you never let drop.
+            rings are calories, protein, carbs and fats - protein is the one you never let drop.
           </p>
         </motion.div>
 
@@ -250,7 +250,7 @@ export default function Overlay({ setRef, checklistApi }) {
             </p>
             <p>
               <b className="text-ink/70">Note:</b> general fitness and nutrition guidance, not medical advice.
-              Confirm new supplements and any aggressive dieting with a doctor — especially given the
+              Confirm new supplements and any aggressive dieting with a doctor - especially given the
               visceral-fat ({profile.visceralFat}) and waist-hip ({profile.waistHip}) readings.
             </p>
           </div>

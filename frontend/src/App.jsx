@@ -4,7 +4,7 @@ import Overlay from './Overlay';
 import { SECTIONS } from './data/sections';
 import { useChecklist } from './hooks/useChecklist';
 
-/* Keeps a WebGL failure from blanking the whole page — the content still works. */
+/* Keeps a WebGL failure from blanking the whole page - the content still works. */
 class WorldBoundary extends React.Component {
   constructor(p) {
     super(p);
@@ -48,7 +48,7 @@ export default function App() {
       if (barRef.current) barRef.current.style.transform = `scaleX(${rawP})`;
 
       // Camera is driven by a CONTINUOUS section index, computed from the real
-      // section centers — robust to sections having different heights.
+      // section centers - robust to sections having different heights.
       const mid = window.scrollY + window.innerHeight / 2;
       const centers = sectionEls.current.map((el) => (el ? el.offsetTop + el.offsetHeight / 2 : null));
       const last = centers.length - 1;

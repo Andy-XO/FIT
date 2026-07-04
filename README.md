@@ -4,21 +4,21 @@ A system-driven fitness transformation app focused on fat loss with coaching log
 
 ## Structure
 - `backend`: Express + MongoDB + JWT APIs
-- `frontend`: React + Vite + Tailwind — an immersive **3D single-page experience**
+- `frontend`: React + Vite + Tailwind - an immersive **3D single-page experience**
   (Three.js / react-three-fiber) that renders your InBody 260 numbers and the
   fat-loss system as a world you scroll through. Runs standalone, no backend needed.
 
 ## The 3D experience (frontend)
-A cinematic scroll journey — the camera flies down through a WebGL world:
-1. **Start** — a living, breathing emerald core (you, now) in a particle field
-2. **Body** — rotatable composition model: lean core, translucent fat shell,
+A cinematic scroll journey - the camera flies down through a WebGL world:
+1. **Start** - a living, breathing emerald core (you, now) in a particle field
+2. **Body** - rotatable composition model: lean core, translucent fat shell,
    pulsing red visceral-fat orb (17 ⚠)
-3. **Descent** — a glowing 3D slope from 116 kg → 95–100 kg milestone → goal
-4. **Fuel** — animated 3D rings for calories / protein / carbs / fats
-5. **System** — the full checklist as interactive cards; ticks persist in localStorage
-6. **Flags** — the visceral-fat / waist-hip health warnings
+3. **Descent** - a glowing 3D slope from 116 kg → 95-100 kg milestone → goal
+4. **Fuel** - animated 3D rings for calories / protein / carbs / fats
+5. **System** - the full checklist as interactive cards; ticks persist in localStorage
+6. **Flags** - the visceral-fat / waist-hip health warnings
 
-Data lives in `frontend/src/data/profile.js` — edit that one file to update every
+Data lives in `frontend/src/data/profile.js` - edit that one file to update every
 scene. Built with `@react-three/fiber`, `drei`, `postprocessing` (bloom), and
 `framer-motion`.
 
