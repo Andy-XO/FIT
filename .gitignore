@@ -1,0 +1,20 @@
+# dependencies
+node_modules/
+
+# build output
+frontend/dist/
+
+# local data (your tracker records live here — not for version control)
+backend/data/
+
+# env & secrets
+.env
+*.local
+
+# logs
+*.log
+npm-debug.log*
+
+# os / editor
+.DS_Store
+Thumbs.db

@@ -1,11 +1,4 @@
-const mongoose = require('mongoose');
-
-const workoutSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  name: String,
-  dayType: String,
-  exercises: [{ name: String, sets: Number, reps: Number, weight: Number }],
-  completedAt: Date
-}, { timestamps: true });
-
-module.exports = mongoose.model('Workout', workoutSchema);
+// Backed by the local JSON store (see config/store.js).
+// Fields: userId, name, dayType, exercises[{name,sets,reps,weight}], completedAt.
+const { collection } = require('../config/store');
+module.exports = collection('workouts');

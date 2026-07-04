@@ -22,24 +22,42 @@ Data lives in `frontend/src/data/profile.js` - edit that one file to update ever
 scene. Built with `@react-three/fiber`, `drei`, `postprocessing` (bloom), and
 `framer-motion`.
 
+## The Tracker (frontend ⇄ backend)
+Open the **＋ Log today** button (bottom-left of the 3D site) for a slide-in tracker:
+- **Today** — calories, protein/carbs/fats, steps, water, sleep, weight, "training done",
+  and a note. Saved per day; returns coach tips when something's low. Progress bars vs targets.
+- **Workout** — pick a template or build your own (exercises · sets · reps · kg), log it,
+  and see your recent workouts.
+- **Progress** — latest weight, 7-day change, kg-to-goal, a weight-trend sparkline,
+  weekly adherence / training consistency, and the last 7 days.
+
+A single local account is created automatically on this device (no login screen). Your
+records persist to `backend/data/db.json`.
+
+## Storage — no database to install
+The backend uses a **zero-setup JSON file store** (`backend/src/config/store.js`) that mirrors
+the Mongoose API the controllers use, so `npm run dev` just works. Data lives in
+`backend/data/db.json` (git-ignored). Mongoose/MongoDB are no longer required.
+
 ## Core flows implemented
-- Onboarding profile with automatic calorie/macronutrient target calculation
-- Daily logs for calories/macros/steps/water/sleep/workout/habits/gut health
-- Workout and meal tracking with starter templates (including Indian meal options)
-- Weekly analytics endpoint for adherence and consistency
+- Automatic calorie/macronutrient targets (seeded from the InBody scan)
+- Daily logs for calories/macros/steps/water/sleep/weight/workout, per date
+- Workout logging with starter templates + history
+- Weekly analytics for adherence and training consistency
 - Smart coach tips generated from daily behavior
 
 ## Run
+Two terminals (or use `.claude/launch.json`):
 ```bash
-cd backend && npm install && npm run dev
-cd frontend && npm install && npm run dev
+cd backend  && npm install && npm run dev   # API on :5000, writes backend/data/db.json
+cd frontend && npm install && npm run dev   # 3D app on :5173
 ```
+The 3D experience runs without the backend; the Tracker needs the backend running.
 
 ## API routes
-- `POST /api/auth/register`
-- `POST /api/auth/login`
+- `POST /api/auth/register`, `POST /api/auth/login`, `GET /api/me`
 - `GET/POST /api/logs/today`
-- `GET /api/workouts/templates`, `POST /api/workouts`
+- `GET /api/workouts` (history), `GET /api/workouts/templates`, `POST /api/workouts`
 - `GET /api/meals`, `POST /api/meals`, `GET /api/meals/templates`
 - `GET /api/analytics/weekly`
 

@@ -1,12 +1,4 @@
-const mongoose = require('mongoose');
-
-const mealSchema = new mongoose.Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  name: String,
-  calories: Number,
-  macros: { protein: Number, carbs: Number, fats: Number },
-  template: { type: Boolean, default: false },
-  tags: [String]
-}, { timestamps: true });
-
-module.exports = mongoose.model('Meal', mealSchema);
+// Backed by the local JSON store (see config/store.js).
+// Fields: userId, name, calories, macros{protein,carbs,fats}, template, tags[].
+const { collection } = require('../config/store');
+module.exports = collection('meals');

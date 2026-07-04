@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import World from './three/World';
 import Overlay from './Overlay';
+import Tracker from './components/tracker/Tracker';
 import { SECTIONS } from './data/sections';
 import { useChecklist } from './hooks/useChecklist';
 
@@ -137,6 +138,8 @@ export default function App() {
       </nav>
 
       <Overlay setRef={setRef} checklistApi={checklistApi} />
+
+      <Tracker />
     </>
   );
 }
