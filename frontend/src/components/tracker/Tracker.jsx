@@ -1,9 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import {
-  bootstrapAuth, getMe, getToday, saveToday, listWorkouts, logWorkout, getWeekly,
-} from '../../services/api';
-import { todayStr, daysAgo } from '../../utils/date';
+import { useTracker } from '../../state/TrackerContext';
 import TodayTab from './TodayTab';
 import WorkoutTab from './WorkoutTab';
 import ProgressTab from './ProgressTab';
@@ -15,71 +12,19 @@ const TABS = [
 ];
 
 export default function Tracker() {
-  const today = todayStr();
+  const {
+    status, me, todayLog, tips, workouts, weekly, saving, logging, connect, save, addWorkout, today,
+  } = useTracker();
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState('today');
-  const [status, setStatus] = useState('connecting'); // connecting | online | offline
-  const [me, setMe] = useState(null);
-  const [log, setLog] = useState(null);
-  const [tips, setTips] = useState([]);
-  const [workouts, setWorkouts] = useState([]);
-  const [weekly, setWeekly] = useState(null);
-  const [saving, setSaving] = useState(false);
-  const [logging, setLogging] = useState(false);
-
-  const loadWeekly = useCallback(() => getWeekly(daysAgo(6), today).then(setWeekly).catch(() => {}), [today]);
-
-  const connect = useCallback(async () => {
-    setStatus('connecting');
-    try {
-      await bootstrapAuth();
-      const [m, l, w] = await Promise.all([getMe(), getToday(today), listWorkouts()]);
-      setMe(m);
-      setLog(l);
-      setWorkouts(w);
-      await loadWeekly();
-      setStatus('online');
-    } catch {
-      setStatus('offline');
-    }
-  }, [today, loadWeekly]);
-
-  useEffect(() => {
-    connect();
-  }, [connect]);
-
-  const handleSave = async (payload) => {
-    setSaving(true);
-    try {
-      const { log: saved, tips: t } = await saveToday({ ...payload, date: today });
-      setLog(saved);
-      setTips(t || []);
-      loadWeekly();
-    } catch {
-      setStatus('offline');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleLogWorkout = async (payload) => {
-    setLogging(true);
-    try {
-      const w = await logWorkout(payload);
-      setWorkouts((prev) => [w, ...prev]);
-    } catch {
-      setStatus('offline');
-    } finally {
-      setLogging(false);
-    }
-  };
 
   return (
     <>
       {/* launch button */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed left-4 md:left-6 bottom-5 z-30 flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-[13px] text-[#05100c] shadow-lg"
+        aria-label="Open tracker to log today"
+        className="fixed left-4 md:left-6 bottom-5 z-30 flex items-center gap-2 rounded-full px-4 py-3 font-semibold text-[13px] text-[#05100c] shadow-lg focus-ring"
         style={{ background: 'linear-gradient(90deg,#3ddc97,#5eead4)', boxShadow: '0 6px 24px rgba(61,220,151,0.35)' }}
       >
         <span className="text-base leading-none">＋</span> Log today
@@ -97,6 +42,8 @@ export default function Tracker() {
             />
             <motion.aside
               className="fixed right-0 top-0 z-50 h-full w-full sm:w-[420px] flex flex-col"
+              role="dialog"
+              aria-label="Tracker"
               style={{ background: 'rgba(6,18,14,0.92)', backdropFilter: 'blur(14px)', borderLeft: '1px solid rgba(94,234,212,0.18)' }}
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
@@ -111,7 +58,7 @@ export default function Tracker() {
                     {status === 'online' ? 'Log & records' : status === 'connecting' ? 'Connecting…' : 'Offline'}
                   </h2>
                 </div>
-                <button onClick={() => setOpen(false)} className="text-ink/50 hover:text-ink text-2xl leading-none">×</button>
+                <button onClick={() => setOpen(false)} aria-label="Close tracker" className="text-ink/50 hover:text-ink text-2xl leading-none focus-ring rounded">×</button>
               </div>
 
               {/* tabs */}
@@ -120,7 +67,7 @@ export default function Tracker() {
                   <button
                     key={t.id}
                     onClick={() => setTab(t.id)}
-                    className={`mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-colors ${
+                    className={`mono text-[11px] uppercase tracking-wider px-3 py-1.5 rounded-full transition-colors focus-ring ${
                       tab === t.id ? 'bg-emerald2 text-[#05100c] font-bold' : 'text-ink/50 hover:text-ink'
                     }`}
                   >
@@ -137,15 +84,15 @@ export default function Tracker() {
                       Can’t reach the tracker API. Start the backend with{' '}
                       <span className="mono text-emerald2">npm run dev</span> in the <span className="mono">backend</span> folder.
                     </p>
-                    <button onClick={connect} className="mono text-[11px] text-emerald2 hover:underline">retry</button>
+                    <button onClick={connect} className="mono text-[11px] text-emerald2 hover:underline focus-ring rounded">retry</button>
                   </div>
                 )}
                 {status === 'connecting' && <p className="text-[13px] text-ink/50">Connecting to your tracker…</p>}
                 {status === 'online' && tab === 'today' && (
-                  <TodayTab me={me} log={log} tips={tips} saving={saving} onSave={handleSave} />
+                  <TodayTab me={me} log={todayLog} tips={tips} saving={saving} onSave={save} />
                 )}
                 {status === 'online' && tab === 'workout' && (
-                  <WorkoutTab workouts={workouts} onLog={handleLogWorkout} logging={logging} />
+                  <WorkoutTab workouts={workouts} onLog={addWorkout} logging={logging} />
                 )}
                 {status === 'online' && tab === 'progress' && <ProgressTab weekly={weekly} />}
               </div>

@@ -1,9 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import World from './three/World';
 import Overlay from './Overlay';
 import Tracker from './components/tracker/Tracker';
 import { SECTIONS } from './data/sections';
 import { useChecklist } from './hooks/useChecklist';
+import { useReducedMotion } from './hooks/useReducedMotion';
+import { useTracker } from './state/TrackerContext';
 
 /* Keeps a WebGL failure from blanking the whole page - the content still works. */
 class WorldBoundary extends React.Component {
@@ -22,19 +25,46 @@ class WorldBoundary extends React.Component {
   }
 }
 
+function Intro({ show }) {
+  return (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          className="fixed inset-0 z-[70] flex flex-col items-center justify-center"
+          style={{ background: '#05100c' }}
+          initial={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.7, ease: 'easeInOut' }}
+        >
+          <div className="relative h-16 w-16">
+            <span className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle,#3ddc97,#2f5d50)', boxShadow: '0 0 40px #3ddc97' }} />
+            <span className="absolute inset-0 rounded-full border-2 border-teal2/40 animate-ping" />
+          </div>
+          <p className="eyebrow mt-6 animate-pulse">Building your world…</p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export default function App() {
   const scrollRef = useRef({ progress: 0, mx: 0, my: 0 });
   const barRef = useRef(null);
   const sectionEls = useRef([]);
   const [active, setActive] = useState(0);
+  const [ready, setReady] = useState(false);
   const checklistApi = useChecklist();
+  const reduced = useReducedMotion();
+  const { latestWeight, startWeight, goalWeight } = useTracker();
 
-  const setRef = useCallback(
-    (i) => (el) => {
-      sectionEls.current[i] = el;
-    },
-    []
-  );
+  const setRef = useCallback((i) => (el) => { sectionEls.current[i] = el; }, []);
+
+  // fade the intro once the scene is up (with a safety timeout)
+  const onWorldReady = useCallback(() => setReady(true), []);
+  useEffect(() => {
+    const t = setTimeout(() => setReady(true), 2600);
+    return () => clearTimeout(t);
+  }, []);
 
   // scroll → progress (for 3D + progress bar) and active section (for nav)
   useEffect(() => {
@@ -43,13 +73,9 @@ export default function App() {
       raf = 0;
       const doc = document.documentElement;
       const max = doc.scrollHeight - window.innerHeight;
-
-      // Progress bar tracks raw scroll distance.
       const rawP = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
       if (barRef.current) barRef.current.style.transform = `scaleX(${rawP})`;
 
-      // Camera is driven by a CONTINUOUS section index, computed from the real
-      // section centers - robust to sections having different heights.
       const mid = window.scrollY + window.innerHeight / 2;
       const centers = sectionEls.current.map((el) => (el ? el.offsetTop + el.offsetHeight / 2 : null));
       const last = centers.length - 1;
@@ -68,13 +94,10 @@ export default function App() {
       }
       scrollRef.current.coord = coord;
       scrollRef.current.progress = last > 0 ? coord / last : 0;
-
       const idx = Math.round(coord);
       setActive((a) => (a === idx ? a : idx));
     };
-    const onScroll = () => {
-      if (!raf) raf = requestAnimationFrame(update);
-    };
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update); };
     const onMove = (e) => {
       scrollRef.current.mx = (e.clientX / window.innerWidth) * 2 - 1;
       scrollRef.current.my = -((e.clientY / window.innerHeight) * 2 - 1);
@@ -91,37 +114,46 @@ export default function App() {
     };
   }, []);
 
-  const goTo = (i) => sectionEls.current[i]?.scrollIntoView({ behavior: 'smooth' });
+  const goTo = (i) => sectionEls.current[i]?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
 
   return (
     <>
+      <Intro show={!ready} />
+
       <WorldBoundary>
-        <World scrollRef={scrollRef} completion={checklistApi.completion} />
+        <World
+          scrollRef={scrollRef}
+          completion={checklistApi.completion}
+          reduced={reduced}
+          latestWeight={latestWeight}
+          startWeight={startWeight}
+          goalWeight={goalWeight}
+          onReady={onWorldReady}
+        />
       </WorldBoundary>
+
+      {/* brand mark */}
+      <div className="fixed left-4 md:left-6 top-4 z-20 flex items-center gap-2 select-none">
+        <span className="h-2.5 w-2.5 rounded-full" style={{ background: '#3ddc97', boxShadow: '0 0 10px #3ddc97' }} />
+        <span className="mono text-[12px] font-bold tracking-[0.2em] text-ink/80">FIT</span>
+      </div>
 
       {/* top scroll progress bar */}
       <div className="fixed top-0 left-0 right-0 z-20 h-[3px] bg-transparent">
-        <div
-          ref={barRef}
-          className="h-full origin-left"
-          style={{ background: 'linear-gradient(90deg,#2f5d50,#3ddc97,#5eead4)', transform: 'scaleX(0)' }}
-        />
+        <div ref={barRef} className="h-full origin-left" style={{ background: 'linear-gradient(90deg,#2f5d50,#3ddc97,#5eead4)', transform: 'scaleX(0)' }} />
       </div>
 
       {/* side navigation dots */}
-      <nav className="fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-3">
+      <nav aria-label="Sections" className="fixed right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-3">
         {SECTIONS.map((s, i) => (
           <button
             key={s.id}
             onClick={() => goTo(i)}
-            aria-label={s.label}
-            className="group flex items-center gap-2 justify-end"
+            aria-label={`Go to ${s.label}`}
+            aria-current={active === i ? 'true' : undefined}
+            className="group flex items-center gap-2 justify-end focus-ring rounded"
           >
-            <span
-              className={`mono text-[10px] uppercase tracking-wider transition-all ${
-                active === i ? 'text-emerald2 opacity-100' : 'text-ink/40 opacity-0 group-hover:opacity-100'
-              }`}
-            >
+            <span className={`mono text-[10px] uppercase tracking-wider transition-all ${active === i ? 'text-emerald2 opacity-100' : 'text-ink/40 opacity-0 group-hover:opacity-100'}`}>
               {s.label}
             </span>
             <span
@@ -137,7 +169,7 @@ export default function App() {
         ))}
       </nav>
 
-      <Overlay setRef={setRef} checklistApi={checklistApi} />
+      <Overlay setRef={setRef} checklistApi={checklistApi} latestWeight={latestWeight} startWeight={startWeight} />
 
       <Tracker />
     </>

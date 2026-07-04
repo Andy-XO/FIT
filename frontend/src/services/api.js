@@ -21,8 +21,7 @@ const PROFILE_SEED = {
 
 const TOKEN_KEY = 'fit-token';
 
-// Ensures we have a valid session: reuse stored token, else log in, else register.
-export async function bootstrapAuth() {
+async function doBootstrap() {
   let token = localStorage.getItem(TOKEN_KEY);
   if (token) {
     setToken(token);
@@ -44,6 +43,19 @@ export async function bootstrapAuth() {
   localStorage.setItem(TOKEN_KEY, token);
   setToken(token);
   return token;
+}
+
+// Memoised so concurrent callers (tracker + live stats) share one bootstrap —
+// avoids a double-register race on first ever load. Retries only on failure.
+let bootstrapPromise = null;
+export function bootstrapAuth() {
+  if (!bootstrapPromise) {
+    bootstrapPromise = doBootstrap().catch((e) => {
+      bootstrapPromise = null; // allow retry
+      throw e;
+    });
+  }
+  return bootstrapPromise;
 }
 
 export const getMe = () => api.get('/me').then((r) => r.data);
