@@ -95,9 +95,13 @@ function GroupCard({ group, isChecked, toggle, accent = '#3ddc97', alert }) {
   );
 }
 
-export default function Overlay({ setRef, checklistApi }) {
+export default function Overlay({ setRef, checklistApi, latestWeight = profile.weightKg, startWeight = profile.weightKg }) {
   const { isChecked, toggle, reset, completion, count, totalItems } = checklistApi;
   const pct = Math.round(completion * 100);
+  const lost = +(startWeight - latestWeight).toFixed(1);
+  const moved = lost > 0.05;
+  const goalWeight = profile.journey[profile.journey.length - 1].weight;
+  const toGoal = +(latestWeight - goalWeight).toFixed(1);
 
   return (
     <div className="overlay">
@@ -118,6 +122,12 @@ export default function Overlay({ setRef, checklistApi }) {
             <Chip k="Pace" v={`~${profile.paceKgPerWeek} kg/wk`} />
             <Chip k="Visceral fat" v={`${profile.visceralFat} ⚠`} flag />
           </div>
+          {moved && (
+            <p className="mono mt-5 text-[12px] text-ink/70">
+              <span className="text-emerald2 font-semibold">Now {latestWeight} kg</span>
+              <span className="text-ink/40"> · −{lost} kg from start · {toGoal} kg to goal</span>
+            </p>
+          )}
           <p className="mono mt-10 text-[11px] text-ink/40 animate-pulse">↓ scroll</p>
         </div>
       </Section>
@@ -158,6 +168,13 @@ export default function Overlay({ setRef, checklistApi }) {
                 <span className="mono text-[13px] font-semibold text-emerald2">{c.weight} kg · {c.bf}%</span>
               </div>
             ))}
+          </div>
+          <div className="mt-3 flex items-center justify-between rounded-xl px-4 py-2.5"
+               style={{ border: '1px solid rgba(61,220,151,0.35)', background: 'rgba(61,220,151,0.08)' }}>
+            <span className="mono text-[13px] text-ink">You are here</span>
+            <span className="mono text-[13px] font-bold text-emerald2">
+              {latestWeight} kg{moved ? ` · ${toGoal} to goal` : ''}
+            </span>
           </div>
         </div>
       </Section>

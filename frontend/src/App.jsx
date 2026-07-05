@@ -102,14 +102,19 @@ export default function App() {
       scrollRef.current.mx = (e.clientX / window.innerWidth) * 2 - 1;
       scrollRef.current.my = -((e.clientY / window.innerHeight) * 2 - 1);
     };
+    // Re-sync immediately when the tab returns to the foreground (rAF is paused
+    // while hidden, so the bar/nav/camera would otherwise show a stale frame).
+    const onVis = () => { if (!document.hidden) update(); };
     window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', onScroll);
     window.addEventListener('pointermove', onMove, { passive: true });
+    document.addEventListener('visibilitychange', onVis);
     update();
     return () => {
       window.removeEventListener('scroll', onScroll);
       window.removeEventListener('resize', onScroll);
       window.removeEventListener('pointermove', onMove);
+      document.removeEventListener('visibilitychange', onVis);
       if (raf) cancelAnimationFrame(raf);
     };
   }, []);

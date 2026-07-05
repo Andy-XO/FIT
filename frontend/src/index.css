@@ -69,8 +69,18 @@ body {
   background: #2f5d50;
 }
 
+/* keyboard focus — visible only for keyboard users, on-brand */
+.focus-ring:focus-visible {
+  outline: 2px solid #5eead4;
+  outline-offset: 2px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .animate-pulse,
+  .animate-ping {
+    animation: none !important;
   }
 }
